@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\Dosen;
 use App\Http\Controllers\Mahasiswa;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\BookingRuanganController;
 use App\Http\Controllers\DendaController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,16 @@ Route::middleware('auth')->group(function () {
         // Users
         Route::get('/users', [Admin\UserController::class, 'index'])->name('users.index');
         Route::post('/users/{user}/unblacklist', [Admin\UserController::class, 'unblacklist'])->name('users.unblacklist');
+
+        // CRUD Ruangan
+        Route::resource('ruangan', Admin\RuanganController::class)->except(['show']);
+
+        // Booking Ruangan (kursi)
+        Route::get('/booking-ruangan', [Admin\BookingRuanganController::class, 'index'])->name('booking-ruangan.index');
+        Route::post('/booking-ruangan/pengaturan', [Admin\BookingRuanganController::class, 'simpanPengaturan'])->name('booking-ruangan.pengaturan');
+        Route::get('/booking-ruangan/{bookingRuangan}', [Admin\BookingRuanganController::class, 'show'])->name('booking-ruangan.show');
+        Route::post('/booking-ruangan/{bookingRuangan}/approve', [Admin\BookingRuanganController::class, 'approve'])->name('booking-ruangan.approve');
+        Route::post('/booking-ruangan/{bookingRuangan}/reject', [Admin\BookingRuanganController::class, 'reject'])->name('booking-ruangan.reject');
     });
 
     // ── DOSEN ─────────────────────────────────────────────────────────────────
@@ -72,6 +83,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/peminjaman/buat', [PeminjamanController::class, 'create'])->name('peminjaman.create');
         Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store');
         Route::get('/peminjaman/{peminjaman}', [PeminjamanController::class, 'show'])->name('peminjaman.show');
+
+        // Booking ruangan per kursi
+        Route::get('/booking-ruangan', [BookingRuanganController::class, 'index'])->name('booking-ruangan.index');
+        Route::get('/booking-ruangan/buat', [BookingRuanganController::class, 'create'])->name('booking-ruangan.create');
+        Route::post('/booking-ruangan', [BookingRuanganController::class, 'store'])->name('booking-ruangan.store');
+        Route::get('/booking-ruangan/kursi-terpakai', [BookingRuanganController::class, 'kursiTerpakai'])->name('booking-ruangan.kursi-terpakai');
+        Route::get('/booking-ruangan/{bookingRuangan}', [BookingRuanganController::class, 'show'])->name('booking-ruangan.show');
+        Route::post('/booking-ruangan/{bookingRuangan}/batal', [BookingRuanganController::class, 'batal'])->name('booking-ruangan.batal');
 
         Route::get('/denda-saya', [DendaController::class, 'index'])->name('denda.index');
     });

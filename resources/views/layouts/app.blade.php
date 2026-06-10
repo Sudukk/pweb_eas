@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'LabPinjam') LabPinjam</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -93,6 +94,12 @@
         <a href="{{ route('admin.peminjaman.index') }}" class="{{ request()->routeIs('admin.peminjaman.*') ? 'active' : '' }}">
             <i class="bi bi-journal-check me-2"></i>Peminjaman
         </a>
+        <a href="{{ route('admin.ruangan.index') }}" class="{{ request()->routeIs('admin.ruangan.*') ? 'active' : '' }}">
+            <i class="bi bi-door-open me-2"></i>Ruangan
+        </a>
+        <a href="{{ route('admin.booking-ruangan.index') }}" class="{{ request()->routeIs('admin.booking-ruangan.*') ? 'active' : '' }}">
+            <i class="bi bi-grid-3x3-gap me-2"></i>Booking Ruangan
+        </a>
         <a href="{{ route('admin.denda.index') }}" class="{{ request()->routeIs('admin.denda.*') ? 'active' : '' }}">
             <i class="bi bi-cash-coin me-2"></i>Denda
         </a>
@@ -116,6 +123,9 @@
         </a>
         <a href="{{ route('peminjaman.create') }}">
             <i class="bi bi-plus-circle me-2"></i>Ajukan Pinjam
+        </a>
+        <a href="{{ route('booking-ruangan.index') }}" class="{{ request()->routeIs('booking-ruangan.*') ? 'active' : '' }}">
+            <i class="bi bi-door-open me-2"></i>Booking Ruangan
         </a>
         <a href="{{ route('denda.index') }}" class="{{ request()->routeIs('denda.*') ? 'active' : '' }}">
             <i class="bi bi-cash-coin me-2"></i>Denda Saya
@@ -175,6 +185,7 @@
     </div>
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 (function () {
@@ -195,6 +206,11 @@
         a.addEventListener('click', () => { if (window.innerWidth < 768) closeSidebar(); });
     });
 })();
+
+// Bootstrap tooltips
+document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    new bootstrap.Tooltip(el, { trigger: 'hover focus' });
+});
 </script>
 @stack('scripts')
 </body>
