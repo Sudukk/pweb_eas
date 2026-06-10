@@ -14,7 +14,7 @@
                         <th>Nama</th>
                         <th class="d-none d-md-table-cell">Email</th>
                         <th class="d-none d-lg-table-cell">NIM/NIP</th>
-                        <th>Role</th>
+                        <th>Sebagai</th>
                         <th class="d-none d-xl-table-cell">Jurusan</th>
                         <th>Status</th>
                         <th>Aksi</th>

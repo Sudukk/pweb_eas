@@ -43,9 +43,9 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">Sebagai <span class="text-danger">*</span></label>
                             <select name="role" id="roleSelect" class="form-select @error('role') is-invalid @enderror" required>
-                                <option value="">Pilih Role</option>
+                                <option value="">Pilih Sebagai</option>
                                 <option value="mahasiswa" {{ old('role') === 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
                                 <option value="dosen" {{ old('role') === 'dosen' ? 'selected' : '' }}>Dosen</option>
                             </select>
@@ -54,7 +54,7 @@
 
                         {{-- NIM (mahasiswa) --}}
                         <div class="col-md-6" id="nimWrapper" style="display:none">
-                            <label class="form-label fw-semibold">NIM <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">NRP <span class="text-danger">*</span></label>
                             <input type="text" name="nim" id="nimInput"
                                 class="form-control @error('nim') is-invalid @enderror"
                                 value="{{ old('nim') }}" maxlength="20">
