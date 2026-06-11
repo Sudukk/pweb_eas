@@ -62,7 +62,7 @@
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
                                             @if($item->foto)
-                                                <img src="{{ Storage::url($item->foto) }}"
+                                                <img src="{{ $item->foto_url }}"
                                                      style="width:36px;height:36px;object-fit:cover"
                                                      class="rounded flex-shrink-0">
                                             @else

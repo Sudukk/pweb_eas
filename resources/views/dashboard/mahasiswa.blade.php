@@ -41,6 +41,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>Kode</th>
+                        <th>Barang Dipinjam</th>
                         <th class="d-none d-sm-table-cell">Tgl Pinjam</th>
                         <th>Status</th>
                         <th></th>
@@ -50,12 +51,13 @@
                     @forelse($riwayat as $p)
                     <tr>
                         <td><code class="small">{{ $p->kode_pinjam }}</code></td>
+                        <td style="min-width:160px">@include('partials.barang-pinjam', ['detail' => $p->detail])</td>
                         <td class="small d-none d-sm-table-cell">{{ $p->tanggal_pinjam->format('d/m/Y') }}</td>
                         <td>@include('components.status-badge', ['status' => $p->status])</td>
                         <td><a href="{{ route('peminjaman.show', $p) }}" class="btn btn-sm btn-outline-primary">Detail</a></td>
                     </tr>
                     @empty
-                    <tr><td colspan="4" class="text-center text-muted py-3">Belum ada peminjaman.</td></tr>
+                    <tr><td colspan="5" class="text-center text-muted py-3">Belum ada peminjaman.</td></tr>
                     @endforelse
                 </tbody>
             </table>

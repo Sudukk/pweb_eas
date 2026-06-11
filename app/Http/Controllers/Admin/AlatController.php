@@ -29,7 +29,7 @@ class AlatController extends Controller
             'foto'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'jumlah_total' => 'required|integer|min:1',
             'kondisi'      => 'required|in:baik,rusak_ringan,maintenance',
-        ]);
+        ], $this->fotoMessages());
 
         $data = $request->only('kode_alat', 'nama', 'deskripsi', 'jumlah_total', 'kondisi');
         $data['jumlah_tersedia'] = $data['jumlah_total'];
@@ -65,7 +65,7 @@ class AlatController extends Controller
             'jumlah_total'    => 'required|integer|min:1',
             'jumlah_tersedia' => 'required|integer|min:0',
             'kondisi'         => 'required|in:baik,rusak_ringan,maintenance',
-        ]);
+        ], $this->fotoMessages());
 
         $data = $request->only('kode_alat', 'nama', 'deskripsi', 'jumlah_total', 'jumlah_tersedia', 'kondisi');
 
@@ -86,5 +86,18 @@ class AlatController extends Controller
         $alat->delete();
         return redirect()->route('admin.alat.index')
             ->with('success', 'Alat berhasil dihapus.');
+    }
+
+    /**
+     * Pesan validasi khusus untuk unggahan foto (termasuk kasus ukuran melebihi batas).
+     */
+    private function fotoMessages(): array
+    {
+        return [
+            'foto.max'      => 'Ukuran foto maksimal 2 MB.',
+            'foto.uploaded' => 'Gagal mengunggah foto: ukuran melebihi batas server. Maksimal 2 MB.',
+            'foto.image'    => 'File harus berupa gambar (jpg, jpeg, atau png).',
+            'foto.mimes'    => 'Format foto harus jpg, jpeg, atau png.',
+        ];
     }
 }

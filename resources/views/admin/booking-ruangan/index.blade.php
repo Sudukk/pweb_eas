@@ -19,8 +19,7 @@
             <span class="badge bg-success ms-1">
                 <i class="bi bi-check-circle me-1"></i>Berjalan {{ $pengaturan->last_ran_date->format('d/m/Y') }}
             </span>
-            @else
-            <span class="badge bg-secondary ms-1">Belum pernah berjalan</span>
+
             @endif
         </div>
         <form action="{{ route('admin.booking-ruangan.pengaturan') }}" method="POST"

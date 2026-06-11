@@ -2,12 +2,16 @@
 @section('title', 'Detail Alat')
 @section('content')
 
+<a href="{{ route('admin.alat.index') }}" class="btn btn-outline-secondary btn-sm mb-3">
+    <i class="bi bi-arrow-left me-1"></i>Kembali
+</a>
+
 <div class="row g-3">
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm">
             <div class="card-body text-center">
                 @if($alat->foto)
-                <img src="{{ Storage::url($alat->foto) }}" class="img-fluid rounded mb-3" style="max-height:200px">
+                <img src="{{ $alat->foto_url }}" class="img-fluid rounded mb-3" style="max-height:200px">
                 @else
                 <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3" style="height:200px">
                     <i class="bi bi-tools text-muted fs-1"></i>
@@ -30,12 +34,9 @@
                 <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Tersedia</span><span class="fw-bold text-success">{{ $alat->jumlah_tersedia }}</span></li>
                 <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Dipinjam</span><span class="fw-bold">{{ $alat->jumlah_total - $alat->jumlah_tersedia }}</span></li>
             </ul>
-            <div class="card-footer bg-white d-flex gap-2">
-                <a href="{{ route('admin.alat.edit', $alat) }}" class="btn btn-primary flex-grow-1">
+            <div class="card-footer bg-white">
+                <a href="{{ route('admin.alat.edit', $alat) }}" class="btn btn-primary w-100">
                     <i class="bi bi-pencil me-1"></i>Edit
-                </a>
-                <a href="{{ route('admin.alat.index') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i>
                 </a>
             </div>
         </div>

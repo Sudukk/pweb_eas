@@ -75,6 +75,10 @@ class RuanganController extends Controller
             'kapasitas_kursi' => 'required|integer|min:1',
             'deskripsi'       => 'nullable|string|max:500',
             'foto'            => 'nullable|image|max:2048',
+        ], [
+            'foto.max'      => 'Ukuran foto maksimal 2 MB.',
+            'foto.uploaded' => 'Gagal mengunggah foto: ukuran melebihi batas server. Maksimal 2 MB.',
+            'foto.image'    => 'File harus berupa gambar (jpg, jpeg, atau png).',
         ]);
 
         $data['aktif'] = $request->boolean('aktif');

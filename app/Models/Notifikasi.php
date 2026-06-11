@@ -35,4 +35,29 @@ class Notifikasi extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Kirim notifikasi ke seorang user.
+     * $tipe: peminjaman | approval | pengembalian | denda
+     */
+    public static function kirim(int $userId, string $judul, string $pesan, string $tipe, ?int $referensiId = null): void
+    {
+        static::create([
+            'user_id'      => $userId,
+            'judul'        => $judul,
+            'pesan'        => $pesan,
+            'tipe'         => $tipe,
+            'referensi_id' => $referensiId,
+            'is_read'      => false,
+            'created_at'   => now(),
+        ]);
+    }
+
+    /** Kirim notifikasi yang sama ke semua admin (mis. saat ada pengajuan baru). */
+    public static function kirimAdmin(string $judul, string $pesan, string $tipe, ?int $referensiId = null): void
+    {
+        User::where('role', 'admin')->pluck('id')->each(
+            fn ($id) => static::kirim($id, $judul, $pesan, $tipe, $referensiId)
+        );
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alat;
+use App\Models\Notifikasi;
 use App\Models\Peminjaman;
 use App\Models\PeminjamanDetail;
 use Illuminate\Http\Request;
@@ -79,14 +80,21 @@ class PeminjamanController extends Controller
                     throw new \Exception('Stok ' . $alat->nama . ' tidak mencukupi.');
                 }
 
+                // Stok BELUM dikurangi di sini — hanya berkurang saat admin menyetujui
+                // (status menjadi "dipinjam").
                 PeminjamanDetail::create([
                     'peminjaman_id' => $peminjaman->id,
                     'alat_id'       => $alatId,
                     'jumlah'        => $jumlah,
                 ]);
-
-                $alat->decrement('jumlah_tersedia', $jumlah);
             }
+
+            Notifikasi::kirimAdmin(
+                'Pengajuan Peminjaman Baru',
+                auth()->user()->name . " mengajukan peminjaman {$peminjaman->kode_pinjam}.",
+                'peminjaman',
+                $peminjaman->id
+            );
         });
 
         return redirect()->route('peminjaman.index')

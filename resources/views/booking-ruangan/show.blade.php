@@ -20,6 +20,10 @@ $statusIcon = match($b->status) {
 };
 @endphp
 
+<a href="{{ route('booking-ruangan.index') }}" class="btn btn-outline-secondary btn-sm mb-3">
+    <i class="bi bi-arrow-left me-1"></i>Kembali
+</a>
+
 {{-- Hero banner --}}
 <div class="rounded-3 overflow-hidden mb-4 shadow-sm position-relative"
      style="height:200px;background:#1e3a5f">
@@ -168,11 +172,8 @@ $statusIcon = match($b->status) {
                     @endif
                 </ul>
             </div>
-            <div class="card-footer bg-white d-flex justify-content-between align-items-center">
-                <a href="{{ route('booking-ruangan.index') }}" class="btn btn-light btn-sm">
-                    <i class="bi bi-arrow-left me-1"></i>Kembali
-                </a>
-                @if(in_array($b->status, ['pending', 'disetujui']))
+            @if(in_array($b->status, ['pending', 'disetujui']))
+            <div class="card-footer bg-white d-flex justify-content-end align-items-center">
                 <form action="{{ route('booking-ruangan.batal', $b) }}" method="POST"
                       onsubmit="return confirm('Batalkan booking ini?')">
                     @csrf
@@ -180,8 +181,8 @@ $statusIcon = match($b->status) {
                         <i class="bi bi-x-circle me-1"></i>Batalkan
                     </button>
                 </form>
-                @endif
             </div>
+            @endif
         </div>
     </div>
 

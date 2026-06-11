@@ -13,6 +13,10 @@ $statusCls = match($b->status) {
 };
 @endphp
 
+<a href="{{ route('admin.booking-ruangan.index') }}" class="btn btn-outline-secondary btn-sm mb-3">
+    <i class="bi bi-arrow-left me-1"></i>Kembali
+</a>
+
 {{-- Hero --}}
 <div class="rounded-3 overflow-hidden mb-4 shadow-sm position-relative"
      style="height:190px;background:#1e3a5f">
@@ -37,7 +41,7 @@ $statusCls = match($b->status) {
 
 <div class="row g-3">
     {{-- ── Kolom kiri: detail ─────────────────────────────────────────────── --}}
-    <div class="{{ $b->kursi_dipilih ? 'col-lg-5' : 'col-lg-7 mx-auto' }}">
+    <div class="col-lg-5">
 
         {{-- Pemohon card --}}
         <div class="card border-0 shadow-sm mb-3">
@@ -123,12 +127,8 @@ $statusCls = match($b->status) {
             </ul>
 
             {{-- Actions --}}
-            <div class="card-footer bg-white d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                <a href="{{ route('admin.booking-ruangan.index') }}" class="btn btn-light btn-sm">
-                    <i class="bi bi-arrow-left me-1"></i>Kembali
-                </a>
-
-                @if(in_array($b->status, ['pending', 'disetujui']))
+            @if(in_array($b->status, ['pending', 'disetujui']))
+            <div class="card-footer bg-white d-flex justify-content-end align-items-center gap-2 flex-wrap">
                 <div class="d-flex gap-2">
                     @if($b->status === 'pending')
                     <form action="{{ route('admin.booking-ruangan.approve', $b) }}" method="POST">
@@ -143,13 +143,12 @@ $statusCls = match($b->status) {
                         <i class="bi bi-x-circle me-1"></i>Tolak
                     </button>
                 </div>
-                @endif
             </div>
+            @endif
         </div>
     </div>
 
     {{-- ── Kolom kanan: denah kursi ────────────────────────────────────────── --}}
-    @if($b->kursi_dipilih)
     <div class="col-lg-7">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between">
@@ -165,13 +164,12 @@ $statusCls = match($b->status) {
             <div class="card-body">
                 @include('components.seat-map', [
                     'kapasitas' => $b->ruangan->kapasitas_kursi,
-                    'dipilih'   => $b->kursi_dipilih,
+                    'dipilih'   => $b->kursi_dipilih ?? [],
                     'terpakai'  => $kursiLain,
                 ])
             </div>
         </div>
     </div>
-    @endif
 </div>
 
 {{-- Modal tolak --}}

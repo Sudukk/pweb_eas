@@ -4,21 +4,22 @@
 
 @php $jamAlokasi = substr(\App\Models\PengaturanBooking::jamAlokasi(), 0, 5); @endphp
 
-<div class="d-flex justify-content-between align-items-center mb-1">
+<div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h5 class="fw-bold mb-0">Booking Ruangan</h5>
+        <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+            Booking Ruangan
+            <span tabindex="0"
+                  data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
+                  title="Alokasi otomatis pukul <strong>{{ $jamAlokasi }} H-1</strong>.<br>Prioritas: <strong>kelas &rsaquo; dosen &rsaquo; mahasiswa</strong>."
+                  style="cursor:pointer;color:#6c757d">
+                <i class="bi bi-info-circle-fill" style="font-size:.85rem"></i>
+            </span>
+        </h5>
         <p class="text-muted small mb-0">Riwayat dan status pengajuan ruangan Anda</p>
     </div>
     <a href="{{ route('booking-ruangan.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-circle me-1"></i><span class="d-none d-sm-inline">Booking </span>Baru
     </a>
-</div>
-
-<div class="rounded-3 mb-4 mt-3 px-3 py-2 d-flex align-items-center gap-2"
-     style="background:#e8edf5;border:1px solid #c5d3e8">
-    <i class="bi bi-clock-history text-primary flex-shrink-0"></i>
-    <span class="small">Alokasi otomatis pukul <strong>{{ $jamAlokasi }} H-1</strong>
-    Prioritas: <strong>kelas › dosen › mahasiswa</strong>.</span>
 </div>
 
 @if($booking->isEmpty())

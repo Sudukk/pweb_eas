@@ -55,7 +55,7 @@ class AlokasiKursiService
     }
 
     /**
-     * Sisa kursi (count-based) — dipakai untuk approve manual jika booking tidak punya kursi_dipilih.
+     * Sisa kursi (count-based) - dipakai untuk approve manual jika booking tidak punya kursi_dipilih.
      */
     public function kursiTersedia(Ruangan $ruangan, $tanggal, string $mulai, string $selesai, ?int $excludeId = null): int
     {
@@ -126,9 +126,9 @@ class AlokasiKursiService
 
                         if (empty($konflik)) {
                             $bisa    = true;
-                            $catatan = 'Disetujui otomatis — kursi tersedia.';
+                            $catatan = 'Disetujui otomatis - kursi tersedia.';
                         } else {
-                            $catatan = 'Ditolak otomatis — kursi ' . implode(', ', $konflik) .
+                            $catatan = 'Ditolak otomatis - kursi ' . implode(', ', $konflik) .
                                        ' sudah diambil booking dengan prioritas lebih tinggi.';
                         }
                     } else {
@@ -142,9 +142,9 @@ class AlokasiKursiService
 
                         if ($booking->jumlah_kursi <= $tersedia) {
                             $bisa    = true;
-                            $catatan = 'Disetujui otomatis — kuota kursi tersedia.';
+                            $catatan = 'Disetujui otomatis - kuota kursi tersedia.';
                         } else {
-                            $catatan = "Ditolak otomatis — kuota tidak cukup pada slot ini (sisa {$tersedia} kursi).";
+                            $catatan = "Ditolak otomatis - kuota tidak cukup pada slot ini (sisa {$tersedia} kursi).";
                         }
                     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Denda;
+use App\Models\Notifikasi;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,7 @@ class PeminjamanController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Peminjaman::with('user');
+        $query = Peminjaman::with(['user', 'detail.alat']);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -39,11 +40,35 @@ class PeminjamanController extends Controller
             return back()->with('error', 'Peminjaman tidak bisa disetujui.');
         }
 
-        $peminjaman->update([
-            'status'           => 'dipinjam',
-            'reviewed_by_admin'=> auth()->id(),
-            'admin_reviewed_at'=> now(),
-        ]);
+        $peminjaman->load('detail.alat');
+
+        // Pastikan stok masih cukup saat disetujui.
+        foreach ($peminjaman->detail as $d) {
+            if ($d->alat->jumlah_tersedia < $d->jumlah) {
+                return back()->with('error', "Stok {$d->alat->nama} tidak mencukupi (tersedia {$d->alat->jumlah_tersedia}).");
+            }
+        }
+
+        DB::transaction(function () use ($peminjaman) {
+            // Stok berkurang saat alat mulai dipinjam.
+            foreach ($peminjaman->detail as $d) {
+                $d->alat->decrement('jumlah_tersedia', $d->jumlah);
+            }
+
+            $peminjaman->update([
+                'status'           => 'dipinjam',
+                'reviewed_by_admin'=> auth()->id(),
+                'admin_reviewed_at'=> now(),
+            ]);
+        });
+
+        Notifikasi::kirim(
+            $peminjaman->user_id,
+            'Peminjaman Disetujui',
+            "Peminjaman {$peminjaman->kode_pinjam} telah disetujui. Silakan ambil alat.",
+            'approval',
+            $peminjaman->id
+        );
 
         return back()->with('success', 'Peminjaman disetujui.');
     }
@@ -57,15 +82,21 @@ class PeminjamanController extends Controller
         }
 
         DB::transaction(function () use ($peminjaman, $request) {
-            foreach ($peminjaman->detail as $d) {
-                $d->alat->increment('jumlah_tersedia', $d->jumlah);
-            }
+            // Stok tidak perlu dikembalikan: belum dikurangi karena masih "menunggu".
             $peminjaman->update([
                 'status'           => 'ditolak',
                 'catatan_penolakan'=> $request->catatan_penolakan,
                 'reviewed_by_admin'=> auth()->id(),
                 'admin_reviewed_at'=> now(),
             ]);
+
+            Notifikasi::kirim(
+                $peminjaman->user_id,
+                'Peminjaman Ditolak',
+                "Peminjaman {$peminjaman->kode_pinjam} ditolak. Alasan: {$request->catatan_penolakan}",
+                'approval',
+                $peminjaman->id
+            );
         });
 
         return back()->with('success', 'Peminjaman ditolak.');
@@ -134,6 +165,22 @@ class PeminjamanController extends Controller
                     'status'        => 'belum_lunas',
                 ]);
                 $peminjaman->user->update(['is_blacklisted' => true]);
+
+                Notifikasi::kirim(
+                    $peminjaman->user_id,
+                    'Denda Diterbitkan',
+                    "Peminjaman {$peminjaman->kode_pinjam} dikenakan denda Rp " . number_format($request->denda_nominal, 0, ',', '.') . '. Segera lunasi.',
+                    'denda',
+                    $peminjaman->id
+                );
+            } else {
+                Notifikasi::kirim(
+                    $peminjaman->user_id,
+                    'Pengembalian Selesai',
+                    "Pengembalian peminjaman {$peminjaman->kode_pinjam} telah selesai. Terima kasih.",
+                    'pengembalian',
+                    $peminjaman->id
+                );
             }
         });
 

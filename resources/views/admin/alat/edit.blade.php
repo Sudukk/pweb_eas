@@ -19,7 +19,7 @@
                                      style="width:120px;height:120px;cursor:pointer;overflow:hidden;position:relative"
                                      onclick="document.getElementById('fotoInput').click()">
                                     @if($alat->foto)
-                                        <img id="previewImg" src="{{ Storage::url($alat->foto) }}" alt="{{ $alat->nama }}"
+                                        <img id="previewImg" src="{{ $alat->foto_url }}" alt="{{ $alat->nama }}"
                                              style="width:120px;height:120px;object-fit:cover">
                                         <div id="previewPlaceholder" class="d-none text-center text-muted small p-2">
                                             <i class="bi bi-camera fs-3 d-block mb-1"></i>

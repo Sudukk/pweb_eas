@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BookingRuangan;
+use App\Models\Notifikasi;
 use App\Models\PengaturanBooking;
 use App\Models\Ruangan;
 use App\Services\AlokasiKursiService;
@@ -120,7 +121,7 @@ class BookingRuanganController extends Controller
 
         sort($data['kursi_dipilih']);
 
-        BookingRuangan::create([
+        $booking = BookingRuangan::create([
             'kode_booking'  => $kode,
             'user_id'       => auth()->id(),
             'ruangan_id'    => $ruangan->id,
@@ -135,6 +136,13 @@ class BookingRuanganController extends Controller
             'kursi_dipilih' => $data['kursi_dipilih'],
             'status'        => 'pending',
         ]);
+
+        Notifikasi::kirimAdmin(
+            'Pengajuan Booking Ruangan Baru',
+            auth()->user()->name . " mengajukan booking {$kode} ({$ruangan->nama}).",
+            'peminjaman',
+            $booking->id
+        );
 
         return redirect()->route('booking-ruangan.index')
             ->with('success', 'Pengajuan booking ruangan terkirim. Alokasi otomatis dilakukan pukul 22:00 pada H-1 sesuai prioritas & kuota kursi.');

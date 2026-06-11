@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'LabPinjam') LabPinjam</title>
+    <title>@yield('title', 'PinjamIn') PinjamIn</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -75,7 +75,7 @@
 {{-- SIDEBAR --}}
 <div class="sidebar" id="sidebar">
     <div class="p-4 border-bottom border-secondary d-flex align-items-center justify-content-between">
-        <span class="text-white fw-bold fs-5"><i class="bi bi-box-seam me-2"></i>LabPinjam</span>
+        <span class="text-white fw-bold fs-5"><i class="bi bi-box-seam me-2"></i>PinjamIn</span>
         <button class="btn btn-link p-0 d-md-none" id="sidebarClose" style="color:rgba(255,255,255,.6)">
             <i class="bi bi-x-lg"></i>
         </button>
@@ -152,10 +152,37 @@
             </button>
             <span class="fw-semibold">@yield('title', 'Dashboard')</span>
         </div>
-        <span class="text-muted small d-none d-sm-inline">
-            {{ auth()->user()->name }}
-            <span class="badge bg-primary ms-1">{{ ucfirst(auth()->user()->role) }}</span>
-        </span>
+        <div class="d-flex align-items-center gap-3">
+            {{-- Bel notifikasi --}}
+            <div class="dropdown">
+                <button class="btn btn-link p-0 position-relative text-dark" id="notifBell" type="button"
+                        data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                    <i class="bi bi-bell fs-5"></i>
+                    <span id="notifBadge"
+                          class="position-absolute translate-middle badge rounded-pill bg-danger"
+                          style="top:4px;left:80%;font-size:.58rem;display:none">0</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0"
+                     style="width:330px;max-width:92vw" aria-labelledby="notifBell">
+                    <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                        <span class="fw-semibold small">Notifikasi</span>
+                        <button class="btn btn-link btn-sm p-0 text-decoration-none small" id="notifMarkAll" type="button">
+                            Tandai dibaca
+                        </button>
+                    </div>
+                    <div id="notifList" style="max-height:360px;overflow-y:auto">
+                        <div class="text-center text-muted small py-4">Memuat...</div>
+                    </div>
+                    <a href="{{ route('notifikasi.index') }}"
+                       class="d-block text-center small py-2 border-top text-decoration-none">Lihat semua</a>
+                </div>
+            </div>
+
+            <span class="text-muted small d-none d-sm-inline">
+                {{ auth()->user()->name }}
+                <span class="badge bg-primary ms-1">{{ ucfirst(auth()->user()->role) }}</span>
+            </span>
+        </div>
     </div>
 
     <div class="p-4">
@@ -211,6 +238,75 @@
 document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
     new bootstrap.Tooltip(el, { trigger: 'hover focus' });
 });
+
+// ── Bel notifikasi ────────────────────────────────────────────────
+(function () {
+    const badge   = document.getElementById('notifBadge');
+    const list    = document.getElementById('notifList');
+    const markAll = document.getElementById('notifMarkAll');
+    if (!badge || !list) return;
+
+    const RECENT_URL   = "{{ route('notifikasi.recent') }}";
+    const MARKALL_URL  = "{{ route('notifikasi.baca-semua') }}";
+    const CSRF         = document.querySelector('meta[name="csrf-token"]').content;
+    const ALL_URL      = "{{ route('notifikasi.index') }}";
+
+    const ICON = {
+        peminjaman:   ['bi-journal-text', '#0d6efd'],
+        approval:     ['bi-check-circle',  '#198754'],
+        pengembalian: ['bi-box-arrow-in-left', '#0dcaf0'],
+        denda:        ['bi-cash-coin', '#dc3545'],
+    };
+
+    function escapeHtml(s) {
+        const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+    }
+
+    function render(data) {
+        // Badge
+        if (data.unread > 0) {
+            badge.textContent = data.unread > 99 ? '99+' : data.unread;
+            badge.style.display = '';
+        } else {
+            badge.style.display = 'none';
+        }
+
+        // List
+        if (!data.items.length) {
+            list.innerHTML = '<div class="text-center text-muted small py-4">'
+                + '<i class="bi bi-bell-slash d-block mb-1 fs-5"></i>Belum ada notifikasi</div>';
+            return;
+        }
+        list.innerHTML = data.items.map(n => {
+            const [ic, col] = ICON[n.tipe] || ['bi-bell', '#6c757d'];
+            const bg = n.is_read ? '#fff' : '#eef4ff';
+            return '<a href="' + ALL_URL + '" class="d-flex gap-2 px-3 py-2 text-decoration-none text-dark border-bottom"'
+                + ' style="background:' + bg + '">'
+                + '<i class="bi ' + ic + ' mt-1 flex-shrink-0" style="color:' + col + '"></i>'
+                + '<div class="flex-grow-1" style="min-width:0">'
+                + '<div class="small fw-semibold text-truncate">' + escapeHtml(n.judul) + '</div>'
+                + '<div class="small text-muted" style="font-size:.78rem">' + escapeHtml(n.pesan) + '</div>'
+                + '<div class="text-muted" style="font-size:.68rem">' + escapeHtml(n.waktu || '') + '</div>'
+                + '</div></a>';
+        }).join('');
+    }
+
+    function load() {
+        fetch(RECENT_URL, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+            .then(r => r.json()).then(render).catch(() => {});
+    }
+
+    markAll.addEventListener('click', function () {
+        fetch(MARKALL_URL, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin',
+        }).then(() => load()).catch(() => {});
+    });
+
+    load();
+    setInterval(load, 30000);   // poll tiap 30 detik
+})();
 </script>
 @stack('scripts')
 </body>

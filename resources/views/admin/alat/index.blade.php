@@ -29,7 +29,7 @@
                         <td class="ps-3">
                             @if($item->foto)
                                 <a href="{{ route('admin.alat.show', $item) }}">
-                                    <img src="{{ Storage::url($item->foto) }}"
+                                    <img src="{{ $item->foto_url }}"
                                          style="width:48px;height:48px;object-fit:cover"
                                          class="rounded shadow-sm">
                                 </a>

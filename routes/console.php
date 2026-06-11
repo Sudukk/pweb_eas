@@ -9,7 +9,7 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Alokasi kursi ruangan — waktu bisa dikonfigurasi oleh admin.
+// Alokasi kursi ruangan - waktu bisa dikonfigurasi oleh admin.
 // Scheduler dijalankan tiap menit; eksekusi hanya terjadi satu kali saat jam cocok.
 Schedule::command('booking:proses')
     ->everyMinute()

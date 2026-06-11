@@ -145,26 +145,11 @@
     font-size:.8rem; color:#1e3a5f; font-weight:500;
 }
 
-/* Live bar */
-.live-bar {
-    display:flex; align-items:center; justify-content:space-between;
-    flex-wrap:wrap; gap:6px;
-    padding:7px 16px;
-    background:#f8f9fc; border-top:1px solid #eef0f5;
-    font-size:.75rem; color:#6c757d;
-}
-.live-clock { font-family:monospace; color:#1e3a5f; font-weight:600; }
-.cutoff-ok  { color:#16a34a; font-weight:600; }
-.cutoff-warn{ color:#dc2626; font-weight:600; }
-.refresh-dot {
-    display:inline-block; width:7px; height:7px;
-    border-radius:50%; background:#cbd5e1; margin-right:4px;
-    transition:background .3s;
-}
-.refresh-dot.active { background:#16a34a; }
-
 /* Spinner */
 .sp-spinner { text-align:center; padding:48px; color:#adb5bd; display:none; }
+
+/* Toolbar pilih semua */
+.sp-toolbar { display:flex; justify-content:center; margin-bottom:16px; }
 </style>
 
 <div class="row justify-content-center">
@@ -232,13 +217,12 @@
             <select name="tipe" id="tipe"
                     class="form-select @error('tipe') is-invalid @enderror" required>
                 @if($role === 'dosen')
-                    <option value="dosen"  {{ old('tipe','dosen') === 'dosen' ? 'selected' : '' }}>Dosen (pribadi) — prioritas 2</option>
-                    <option value="kelas"  {{ old('tipe') === 'kelas'  ? 'selected' : '' }}>Kelas / Mata Kuliah — prioritas 1</option>
+                    <option value="dosen"  {{ old('tipe','dosen') === 'dosen' ? 'selected' : '' }}>Dosen (pribadi)</option>
+                    <option value="kelas"  {{ old('tipe') === 'kelas'  ? 'selected' : '' }}>Kelas / Mata Kuliah</option>
                 @else
-                    <option value="mahasiswa" selected>Mahasiswa — prioritas 3</option>
+                    <option value="mahasiswa" selected>Mahasiswa</option>
                 @endif
             </select>
-            <div class="form-text">Prioritas alokasi: kelas &gt; dosen &gt; mahasiswa.</div>
             @error('tipe')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
 
@@ -292,7 +276,7 @@
                     @endif
                 </div>
             </div>
-            <div class="form-text">Minimal H+1. Cutoff pengajuan: <strong>{{ $jamAlokasi }} H-1</strong>.</div>
+            <div class="form-text">Minimal H+1</div>
         </div>
 
         {{-- Keperluan --}}
@@ -315,7 +299,7 @@
     <div class="card-footer bg-white d-flex justify-content-between align-items-center">
         <a href="{{ route('booking-ruangan.index') }}" class="btn btn-light">Batal</a>
         <button type="button" class="btn btn-primary px-4" id="btnNext">
-            Lanjut Pilih Kursi <i class="bi bi-arrow-right ms-1"></i>
+            Pilih Kursi
         </button>
     </div>
 </div>
@@ -345,6 +329,13 @@
         {{-- Papan tulis --}}
         <div class="sp-board"><i class="bi bi-easel2 me-1"></i>PAPAN TULIS / DEPAN KELAS</div>
 
+        {{-- Toolbar pilih semua --}}
+        <div class="sp-toolbar" id="spToolbar" style="display:none">
+            <button type="button" class="btn btn-sm btn-outline-primary" id="btnSelectAll">
+                <i class="bi bi-grid-3x3-gap me-1"></i>Pilih Semua Kursi
+            </button>
+        </div>
+
         {{-- Spinner --}}
         <div class="sp-spinner" id="spSpinner">
             <div class="spinner-border text-secondary mb-2" style="width:1.8rem;height:1.8rem"></div>
@@ -371,16 +362,6 @@
         <div class="sp-summary" id="spSummary">
             <i class="bi bi-hand-index me-1 text-secondary"></i>Klik kursi untuk memilih.
         </div>
-    </div>
-
-    {{-- Live bar --}}
-    <div class="live-bar" id="liveBar">
-        <span>
-            <span class="refresh-dot" id="refreshDot"></span>
-            Diperbarui: <span id="lastRefresh">-</span>
-        </span>
-        <span class="live-clock" id="liveClock">-</span>
-        <span id="cutoffStatus"></span>
     </div>
 
     {{-- Footer --}}
@@ -420,6 +401,8 @@
     const spSummary = document.getElementById('spSummary');
     const submitBtn = document.getElementById('btnSubmit');
     const kursiBox  = document.getElementById('kursiInputs');
+    const spToolbar = document.getElementById('spToolbar');
+    const btnSelectAll = document.getElementById('btnSelectAll');
 
     const SEATS_PER_ROW = 8;
     const AISLE_AFTER   = 4;
@@ -432,12 +415,6 @@
     let lastSlotKey = null;
     let currentSlot = null;
 
-    const liveClock    = document.getElementById('liveClock');
-    const lastRefresh  = document.getElementById('lastRefresh');
-    const cutoffStatus = document.getElementById('cutoffStatus');
-    const refreshDot   = document.getElementById('refreshDot');
-
-    let clockInterval    = null;
     let seatInterval     = null;
     let refreshCountdown = REFRESH_EVERY;
 
@@ -581,60 +558,26 @@
         });
     }
 
-    /* ── Live bars ─────────────────────────────────────── */
+    /* ── Auto-refresh kursi terpakai (silent) ──────────── */
     function startLiveBars(tanggal) {
         stopLiveBars();
         refreshCountdown = REFRESH_EVERY;
-        clockInterval = setInterval(() => tickClock(tanggal), 1000);
-        tickClock(tanggal);
         seatInterval = setInterval(() => {
             refreshCountdown--;
             if (refreshCountdown <= 0 && currentSlot) {
                 refreshCountdown = REFRESH_EVERY;
                 fetchTaken(currentSlot.ruanganId, currentSlot.tanggal, currentSlot.mulai, currentSlot.selesai, true);
             }
-            updateRefreshLabel();
         }, 1000);
     }
 
     function stopLiveBars() {
-        clearInterval(clockInterval); clearInterval(seatInterval);
-        clockInterval = seatInterval = null;
-    }
-
-    function tickClock(tanggal) {
-        const now = new Date();
-        liveClock.textContent = formatTime(now);
-        const [y, m, d] = tanggal.split('-').map(Number);
-        const [ch, cm]  = JAM_ALOKASI.split(':').map(Number);
-        const cutoff    = new Date(y, m - 1, d - 1, ch, cm, 0);
-        const diff      = cutoff - now;
-        if (diff <= 0) {
-            cutoffStatus.innerHTML = '<span class="cutoff-warn"><i class="bi bi-x-circle me-1"></i>Cutoff terlewat</span>';
-        } else {
-            const h = Math.floor(diff / 3600000);
-            const min = Math.floor((diff % 3600000) / 60000);
-            const sec = Math.floor((diff % 60000) / 1000);
-            const hms = (h > 0 ? h + 'j ' : '') + String(min).padStart(2,'0') + 'm ' + String(sec).padStart(2,'0') + 'd';
-            cutoffStatus.innerHTML = '<span class="cutoff-ok"><i class="bi bi-clock me-1"></i>Cutoff ' + hms + '</span>';
-        }
+        clearInterval(seatInterval);
+        seatInterval = null;
     }
 
     function markRefreshed() {
-        const t = formatTime(new Date());
-        lastRefresh.textContent = lastRefresh.dataset.last = t;
-        refreshDot.classList.add('active');
-        setTimeout(() => refreshDot.classList.remove('active'), 800);
         refreshCountdown = REFRESH_EVERY;
-    }
-
-    function updateRefreshLabel() {
-        const t = lastRefresh.dataset.last;
-        lastRefresh.textContent = t ? t + ' (' + refreshCountdown + 'd)' : '(' + refreshCountdown + 'd)';
-    }
-
-    function formatTime(d) {
-        return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ':' + String(d.getSeconds()).padStart(2,'0');
     }
 
     /* ── Render seat grid ──────────────────────────────── */
@@ -668,13 +611,51 @@
             }
             spGrid.appendChild(rowEl);
         }
+        spToolbar.style.display = n > 0 ? 'flex' : 'none';
+        updateSelectAllBtn();
     }
+
+    /* Kursi yang bisa dipilih = semua kursi kecuali yang sudah terisi */
+    function availableSeats() {
+        const list = [];
+        for (let no = 1; no <= kapasitas; no++) {
+            if (!takenSeats.has(no)) list.push(no);
+        }
+        return list;
+    }
+
+    /* Apakah semua kursi yang tersedia sudah dipilih */
+    function allSelected() {
+        const avail = availableSeats();
+        return avail.length > 0 && avail.every(no => selected.has(no));
+    }
+
+    function updateSelectAllBtn() {
+        if (!btnSelectAll) return;
+        if (allSelected()) {
+            btnSelectAll.innerHTML = '<i class="bi bi-x-square me-1"></i>Batalkan Semua';
+        } else {
+            btnSelectAll.innerHTML = '<i class="bi bi-grid-3x3-gap me-1"></i>Pilih Semua Kursi';
+        }
+    }
+
+    btnSelectAll.addEventListener('click', function () {
+        if (allSelected()) {
+            availableSeats().forEach(no => selected.delete(no));
+        } else {
+            availableSeats().forEach(no => selected.add(no));
+        }
+        renderGrid(kapasitas);
+        syncHiddenInputs();
+        renderSummary();
+    });
 
     function toggleSeat(no, btn) {
         if (selected.has(no)) { selected.delete(no); btn.className = 'sp-seat available'; }
         else                  { selected.add(no);    btn.className = 'sp-seat selected'; }
         syncHiddenInputs();
         renderSummary();
+        updateSelectAllBtn();
     }
 
     function syncHiddenInputs() {

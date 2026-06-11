@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BookingRuangan;
+use App\Models\Notifikasi;
 use App\Models\PengaturanBooking;
 use App\Services\AlokasiKursiService;
 use Illuminate\Http\Request;
@@ -101,6 +102,14 @@ class BookingRuanganController extends Controller
             'diproses_at' => now(),
         ]);
 
+        Notifikasi::kirim(
+            $bookingRuangan->user_id,
+            'Booking Ruangan Disetujui',
+            "Booking {$bookingRuangan->kode_booking} ({$bookingRuangan->ruangan->nama}) telah disetujui.",
+            'approval',
+            $bookingRuangan->id
+        );
+
         return back()->with('success', 'Booking disetujui.');
     }
 
@@ -117,6 +126,14 @@ class BookingRuanganController extends Controller
             'catatan'     => $request->catatan,
             'diproses_at' => now(),
         ]);
+
+        Notifikasi::kirim(
+            $bookingRuangan->user_id,
+            'Booking Ruangan Ditolak',
+            "Booking {$bookingRuangan->kode_booking} ditolak. Alasan: {$request->catatan}",
+            'approval',
+            $bookingRuangan->id
+        );
 
         return back()->with('success', 'Booking ditolak.');
     }

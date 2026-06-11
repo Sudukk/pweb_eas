@@ -2,6 +2,10 @@
 @section('title', 'Detail Peminjaman')
 @section('content')
 
+<a href="{{ route('admin.peminjaman.index') }}" class="btn btn-outline-secondary btn-sm mb-3">
+    <i class="bi bi-arrow-left me-1"></i>Kembali
+</a>
+
 <div class="row g-3">
     <div class="col-lg-7">
         <div class="card border-0 shadow-sm mb-3">
@@ -123,8 +127,4 @@
         @endif
     </div>
 </div>
-
-<a href="{{ route('admin.peminjaman.index') }}" class="btn btn-outline-secondary btn-sm mt-3">
-    <i class="bi bi-arrow-left me-1"></i>Kembali
-</a>
 @endsection

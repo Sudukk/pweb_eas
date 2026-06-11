@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk LabPinjam</title>
+    <title>Masuk PinjamIn</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -15,7 +15,7 @@
     <div class="auth-card w-100 mx-3">
         <div class="text-center mb-4">
             <i class="bi bi-box-seam-fill text-white fs-1"></i>
-            <h3 class="text-white fw-bold mt-2">LabPinjam</h3>
+            <h3 class="text-white fw-bold mt-2">PinjamIn</h3>
             <p class="text-white-50">Sistem Peminjaman Alat Laboratorium</p>
         </div>
         <div class="card shadow border-0">

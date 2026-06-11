@@ -19,7 +19,8 @@ class DashboardController extends Controller
         $denda  = Denda::where('user_id', $userId)
             ->where('status', 'belum_lunas')->sum('nominal');
 
-        $riwayat = Peminjaman::where('user_id', $userId)
+        $riwayat = Peminjaman::with('detail.alat')
+            ->where('user_id', $userId)
             ->latest()->limit(5)->get();
 
         return view('dashboard.mahasiswa', compact('aktif', 'selesai', 'denda', 'riwayat'));

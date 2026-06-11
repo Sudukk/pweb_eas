@@ -37,6 +37,7 @@
                     <tr>
                         <th>Kode</th>
                         <th>Peminjam</th>
+                        <th>Barang Dipinjam</th>
                         <th class="d-none d-md-table-cell">Tgl Pinjam</th>
                         <th class="d-none d-lg-table-cell">Tgl Kembali</th>
                         <th>Status</th>
@@ -48,6 +49,7 @@
                     <tr>
                         <td><code class="small">{{ $p->kode_pinjam }}</code></td>
                         <td class="small">{{ $p->user->name }}</td>
+                        <td style="min-width:160px">@include('partials.barang-pinjam', ['detail' => $p->detail])</td>
                         <td class="small d-none d-md-table-cell">{{ $p->tanggal_pinjam->format('d/m/Y') }}</td>
                         <td class="small d-none d-lg-table-cell">{{ $p->tanggal_kembali_rencana->format('d/m/Y') }}</td>
                         <td>@include('components.status-badge', ['status' => $p->status])</td>
@@ -59,7 +61,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="text-center text-muted py-3">Tidak ada data.</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-3">Tidak ada data.</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -5,18 +5,24 @@ namespace Database\Seeders;
 use App\Models\Alat;
 use App\Models\BookingRuangan;
 use App\Models\Denda;
+use App\Models\Notifikasi;
 use App\Models\PeminjamanDetail;
 use App\Models\PengaturanDenda;
 use App\Models\Ruangan;
 use App\Models\User;
 use App\Models\Peminjaman;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Salin gambar bawaan alat ke storage/app/public/alat agar foto selalu tersedia
+        // setelah migrate:fresh --seed (tidak bergantung file yang mungkin terhapus).
+        $this->salinGambarAlat();
+
         // Admin
         $admin = User::create([
             'name'     => 'Administrator',
@@ -77,26 +83,20 @@ class DatabaseSeeder extends Seeder
 
         // Alat
         $alatData = [
-            ['kode_alat' => 'JRG-001', 'nama' => 'Cisco Switch 24-Port',      'jumlah_total' => 5,  'foto' => 'alat/JRG-001.jpg'],
-            ['kode_alat' => 'JRG-002', 'nama' => 'Cisco Router 2900',         'jumlah_total' => 3,  'foto' => 'alat/JRG-002.jpg'],
-            ['kode_alat' => 'JRG-003', 'nama' => 'Kabel UTP Cat6 (10m)',      'jumlah_total' => 20, 'foto' => 'alat/JRG-003.jpg'],
-            ['kode_alat' => 'JRG-004', 'nama' => 'Raspberry Pi 4',            'jumlah_total' => 10, 'foto' => 'alat/JRG-004.jpg'],
-            ['kode_alat' => 'PRG-001', 'nama' => 'Laptop ASUS VivoBook',      'jumlah_total' => 15, 'foto' => 'alat/PRG-001.jpg'],
-            ['kode_alat' => 'PRG-002', 'nama' => 'Arduino Uno',               'jumlah_total' => 20, 'foto' => 'alat/PRG-002.jpg'],
-            ['kode_alat' => 'PRG-003', 'nama' => 'ESP32 Module',              'jumlah_total' => 25, 'foto' => 'alat/PRG-003.jpg'],
-            ['kode_alat' => 'MUL-001', 'nama' => 'Kamera Canon EOS M50',     'jumlah_total' => 4,  'foto' => 'alat/MUL-001.jpg'],
-            ['kode_alat' => 'MUL-002', 'nama' => 'Tripod Kamera',             'jumlah_total' => 6,  'foto' => 'alat/MUL-002.jpg'],
-            ['kode_alat' => 'MUL-003', 'nama' => 'Ring Light LED',            'jumlah_total' => 4,  'foto' => 'alat/MUL-003.jpg'],
-            ['kode_alat' => 'MUL-004', 'nama' => 'Microphone Condenser',      'jumlah_total' => 5,  'foto' => 'alat/MUL-004.jpg'],
-            ['kode_alat' => 'MUL-005', 'nama' => 'Drone DJI Mini 3',          'jumlah_total' => 2,  'foto' => 'alat/MUL-005.jpg'],
-            ['kode_alat' => 'ELK-001', 'nama' => 'Multimeter Digital',        'jumlah_total' => 15, 'foto' => 'alat/ELK-001.jpg'],
-            ['kode_alat' => 'ELK-002', 'nama' => 'Osiloskop Digital',         'jumlah_total' => 5,  'foto' => 'alat/ELK-002.jpg'],
-            ['kode_alat' => 'ELK-003', 'nama' => 'Power Supply DC',           'jumlah_total' => 10, 'foto' => 'alat/ELK-003.jpg'],
-            ['kode_alat' => 'SIS-001', 'nama' => 'Server Dell PowerEdge',     'jumlah_total' => 2,  'foto' => 'alat/SIS-001.jpg'],
-            ['kode_alat' => 'SIS-002', 'nama' => 'NAS Storage Synology',      'jumlah_total' => 2,  'foto' => 'alat/SIS-002.jpg'],
-            ['kode_alat' => 'SIS-003', 'nama' => 'Proyektor Epson',           'jumlah_total' => 3,  'foto' => 'alat/SIS-003.jpg'],
-            ['kode_alat' => 'SIS-004', 'nama' => 'Whiteboard Portable',       'jumlah_total' => 4,  'foto' => 'alat/SIS-004.jpg'],
-            ['kode_alat' => 'SIS-005', 'nama' => 'Tablet Wacom',              'jumlah_total' => 6,  'foto' => 'alat/SIS-005.jpg'],
+            // Laboratorium & Riset (Sisfor)
+            ['kode_alat' => 'LAB-001', 'nama' => 'Akses Server Deployment', 'jumlah_total' => 4,  'foto' => 'alat/LAB-001.jpg', 'deskripsi' => 'Laboratorium & Riset (Sisfor) - Akses server untuk deployment arsitektur frontend dan backend.'],
+            ['kode_alat' => 'LAB-002', 'nama' => 'Perangkat Testing UI/UX', 'jumlah_total' => 6,  'foto' => 'alat/LAB-002.jpg', 'deskripsi' => 'Laboratorium & Riset (Sisfor) - Perangkat untuk pengujian dan evaluasi UI/UX aplikasi.'],
+            ['kode_alat' => 'LAB-003', 'nama' => 'Modul IoT',              'jumlah_total' => 12, 'foto' => 'alat/LAB-003.jpg', 'deskripsi' => 'Laboratorium & Riset (Sisfor) - Modul IoT untuk prototipe dan riset perangkat pintar.'],
+
+            // Sekretariat Himpunan & Kepanitiaan
+            ['kode_alat' => 'SEK-001', 'nama' => 'Handy Talky (HT)',        'jumlah_total' => 10, 'foto' => 'alat/SEK-001.jpg', 'deskripsi' => 'Sekretariat Himpunan & Kepanitiaan - Handy Talky (HT) untuk koordinasi operasional event skala besar atau expo.'],
+            ['kode_alat' => 'SEK-002', 'nama' => 'Proyektor',              'jumlah_total' => 5,  'foto' => 'alat/SEK-002.jpg', 'deskripsi' => 'Sekretariat Himpunan & Kepanitiaan - Proyektor untuk presentasi dan kebutuhan operasional event.'],
+            ['kode_alat' => 'SEK-003', 'nama' => 'Sound System',           'jumlah_total' => 3,  'foto' => 'alat/SEK-003.jpg', 'deskripsi' => 'Sekretariat Himpunan & Kepanitiaan - Sound system untuk kebutuhan event skala besar atau expo.'],
+
+            // Fasilitas Multimedia
+            ['kode_alat' => 'MUL-001', 'nama' => 'Kamera',                 'jumlah_total' => 6,  'foto' => 'alat/MUL-001.jpg', 'deskripsi' => 'Fasilitas Multimedia - Kamera untuk dokumentasi visual, editing video, atau motion graphics.'],
+            ['kode_alat' => 'MUL-002', 'nama' => 'Tripod',                 'jumlah_total' => 8,  'foto' => 'alat/MUL-002.jpg', 'deskripsi' => 'Fasilitas Multimedia - Tripod penyangga kamera untuk pengambilan gambar yang stabil.'],
+            ['kode_alat' => 'MUL-003', 'nama' => 'Perlengkapan Lighting',  'jumlah_total' => 5,  'foto' => 'alat/MUL-003.jpg', 'deskripsi' => 'Fasilitas Multimedia - Perlengkapan lighting untuk dokumentasi visual dan motion graphics.'],
         ];
 
         $alatRecords = [];
@@ -104,7 +104,6 @@ class DatabaseSeeder extends Seeder
             $alatRecords[] = Alat::create(array_merge($data, [
                 'jumlah_tersedia' => $data['jumlah_total'],
                 'kondisi'         => 'baik',
-                'deskripsi'       => 'Peralatan laboratorium ' . $data['nama'],
             ]));
         }
 
@@ -125,7 +124,7 @@ class DatabaseSeeder extends Seeder
             'tanggal_pinjam'          => now()->subDays(10),
             'tanggal_kembali_rencana' => now()->subDays(7),
             'tanggal_kembali_aktual'  => now()->subDays(7),
-            'keperluan'               => 'Praktikum jaringan komputer semester 5',
+            'keperluan'               => 'Deployment aplikasi untuk tugas mata kuliah',
             'status'                  => 'selesai',
             'reviewed_by_admin'       => $admin->id,
             'admin_reviewed_at'       => now()->subDays(9),
@@ -152,10 +151,10 @@ class DatabaseSeeder extends Seeder
             'user_id'                 => $mahasiswaUsers[2]->id,
             'tanggal_pinjam'          => now()->addDay(),
             'tanggal_kembali_rencana' => now()->addDays(3),
-            'keperluan'               => 'Praktikum elektronika dasar',
+            'keperluan'               => 'Koordinasi panitia untuk kegiatan expo himpunan',
             'status'                  => 'menunggu',
         ]);
-        PeminjamanDetail::create(['peminjaman_id' => $p3->id, 'alat_id' => $alatRecords[12]->id, 'jumlah' => 2]);
+        PeminjamanDetail::create(['peminjaman_id' => $p3->id, 'alat_id' => $alatRecords[3]->id, 'jumlah' => 2]);
 
         // Peminjaman: menunggu (dosen)
         $p4 = Peminjaman::create([
@@ -163,10 +162,10 @@ class DatabaseSeeder extends Seeder
             'user_id'                 => $dosen1->id,
             'tanggal_pinjam'          => now()->addDay(),
             'tanggal_kembali_rencana' => now()->addDays(5),
-            'keperluan'               => 'Keperluan penelitian — presentasi seminar',
+            'keperluan'               => 'Keperluan penelitian - presentasi seminar',
             'status'                  => 'menunggu',
         ]);
-        PeminjamanDetail::create(['peminjaman_id' => $p4->id, 'alat_id' => $alatRecords[17]->id, 'jumlah' => 1]);
+        PeminjamanDetail::create(['peminjaman_id' => $p4->id, 'alat_id' => $alatRecords[6]->id, 'jumlah' => 1]);
 
         // Peminjaman: ditolak
         $p5 = Peminjaman::create([
@@ -180,7 +179,13 @@ class DatabaseSeeder extends Seeder
             'reviewed_by_admin'       => $admin->id,
             'admin_reviewed_at'       => now()->subDays(2),
         ]);
-        PeminjamanDetail::create(['peminjaman_id' => $p5->id, 'alat_id' => $alatRecords[13]->id, 'jumlah' => 1]);
+        PeminjamanDetail::create(['peminjaman_id' => $p5->id, 'alat_id' => $alatRecords[5]->id, 'jumlah' => 1]);
+
+        // ── Notifikasi (contoh) ────────────────────────────────────────────────
+        Notifikasi::kirim($mahasiswaUsers[0]->id, 'Pengembalian Selesai', "Pengembalian peminjaman {$p1->kode_pinjam} telah selesai. Terima kasih.", 'pengembalian', $p1->id);
+        Notifikasi::kirim($mahasiswaUsers[1]->id, 'Peminjaman Disetujui', "Peminjaman {$p2->kode_pinjam} telah disetujui. Silakan ambil alat.", 'approval', $p2->id);
+        Notifikasi::kirim($mahasiswaUsers[4]->id, 'Peminjaman Ditolak', "Peminjaman {$p5->kode_pinjam} ditolak. Alasan: Keperluan tidak sesuai dengan kegiatan akademik.", 'approval', $p5->id);
+        Notifikasi::kirim($dosen1->id, 'Pengajuan Diterima', 'Pengajuan peminjaman Anda sedang menunggu persetujuan admin.', 'peminjaman', $p4->id);
 
         // ── Ruangan ───────────────────────────────────────────────────────────
         $ruanganData = [
@@ -197,8 +202,8 @@ class DatabaseSeeder extends Seeder
             ['kode_ruangan' => '4201', 'nama' => 'Kelas 4201', 'lokasi' => 'Gedung SI Lt. 4', 'kapasitas_kursi' => 60, 'foto_url' => '/images/ruangan/kelas-1.jpg'],
             ['kode_ruangan' => '4202', 'nama' => 'Kelas 4202', 'lokasi' => 'Gedung SI Lt. 4', 'kapasitas_kursi' => 40, 'foto_url' => '/images/ruangan/kelas-2.jpg'],
             // Studio
-            ['kode_ruangan' => 'STUDIO-PRG', 'nama' => 'Studio Pemrograman',     'lokasi' => 'Gedung SI', 'kapasitas_kursi' => 40, 'foto_url' => '/images/ruangan/studio-pemrograman.jpg',    'deskripsi' => 'Studio Pemrograman Sistem Informasi ITS — dilengkapi workstation dan perangkat pengembangan.'],
-            ['kode_ruangan' => 'STUDIO-APP', 'nama' => 'Studio Aplikasi Terapan','lokasi' => 'Gedung SI', 'kapasitas_kursi' => 42, 'foto_url' => '/images/ruangan/studio-aplikasi-terapan.jpg','deskripsi' => 'Studio Aplikasi Terapan Sistem Informasi ITS — fasilitas untuk pengembangan aplikasi dan riset terapan.'],
+            ['kode_ruangan' => 'STUDIO-PRG', 'nama' => 'Studio Pemrograman',     'lokasi' => 'Gedung SI', 'kapasitas_kursi' => 40, 'foto_url' => '/images/ruangan/studio-pemrograman.jpg',    'deskripsi' => 'Studio Pemrograman Sistem Informasi ITS - dilengkapi workstation dan perangkat pengembangan.'],
+            ['kode_ruangan' => 'STUDIO-APP', 'nama' => 'Studio Aplikasi Terapan','lokasi' => 'Gedung SI', 'kapasitas_kursi' => 42, 'foto_url' => '/images/ruangan/studio-aplikasi-terapan.jpg','deskripsi' => 'Studio Aplikasi Terapan Sistem Informasi ITS - fasilitas untuk pengembangan aplikasi dan riset terapan.'],
         ];
         $ruangan = [];
         foreach ($ruanganData as $data) {
@@ -209,7 +214,7 @@ class DatabaseSeeder extends Seeder
         $besok  = now()->addDay()->toDateString();
         $kodeBk = fn ($i) => 'BKR-' . now()->format('Ymd') . '-' . str_pad($i, 3, '0', STR_PAD_LEFT);
 
-        // Kelas (prioritas 1) — dosen atas nama mata kuliah, 30 kursi di Lab 1
+        // Kelas (prioritas 1) - dosen atas nama mata kuliah, 30 kursi di Lab 1
         BookingRuangan::create([
             'kode_booking' => $kodeBk(1), 'user_id' => $dosen1->id, 'ruangan_id' => $ruangan[0]->id,
             'tipe' => 'kelas', 'prioritas' => 1, 'mata_kuliah' => 'Pemrograman Web - Kelas A',
@@ -217,7 +222,7 @@ class DatabaseSeeder extends Seeder
             'jam_mulai' => '08:00', 'jam_selesai' => '10:00', 'jumlah_kursi' => 25, 'status' => 'pending',
         ]);
 
-        // Dosen pribadi (prioritas 2) — slot bentrok dengan kelas di atas
+        // Dosen pribadi (prioritas 2) - slot bentrok dengan kelas di atas
         BookingRuangan::create([
             'kode_booking' => $kodeBk(2), 'user_id' => $dosen2->id, 'ruangan_id' => $ruangan[0]->id,
             'tipe' => 'dosen', 'prioritas' => 2,
@@ -225,12 +230,28 @@ class DatabaseSeeder extends Seeder
             'jam_mulai' => '08:00', 'jam_selesai' => '10:00', 'jumlah_kursi' => 8, 'status' => 'pending',
         ]);
 
-        // Mahasiswa (prioritas 3) — slot sama, kemungkinan tergeser kuota
+        // Mahasiswa (prioritas 3) - slot sama, kemungkinan tergeser kuota
         BookingRuangan::create([
             'kode_booking' => $kodeBk(3), 'user_id' => $mahasiswaUsers[0]->id, 'ruangan_id' => $ruangan[0]->id,
             'tipe' => 'mahasiswa', 'prioritas' => 3,
             'keperluan' => 'Mengerjakan tugas kelompok', 'tanggal' => $besok,
             'jam_mulai' => '09:00', 'jam_selesai' => '11:00', 'jumlah_kursi' => 4, 'status' => 'pending',
         ]);
+    }
+
+    /** Salin gambar bawaan alat dari folder seeder ke storage publik. */
+    private function salinGambarAlat(): void
+    {
+        $sumber = database_path('seeders/seed-images/alat');
+        $tujuan = storage_path('app/public/alat');
+
+        if (! File::isDirectory($sumber)) {
+            return;
+        }
+        File::ensureDirectoryExists($tujuan);
+
+        foreach (File::files($sumber) as $file) {
+            File::copy($file->getPathname(), $tujuan . DIRECTORY_SEPARATOR . $file->getFilename());
+        }
     }
 }
