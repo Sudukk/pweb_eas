@@ -104,7 +104,7 @@ class DashboardController extends Controller
         $countRuangan = fn ($from, $to) => BookingRuangan::whereBetween('created_at', [$from, $to])->count();
 
         if ($range === 'today') {
-            // Bucket per jam (0..23)
+            // Kelompokkan per jam (0..23)
             $hari = Carbon::today();
             for ($h = 0; $h < 24; $h++) {
                 $from = $hari->copy()->addHours($h);
@@ -116,7 +116,7 @@ class DashboardController extends Controller
             return [$labels, $alat, $ruangan];
         }
 
-        // Bucket harian untuk rentang pendek
+        // Kelompokkan harian untuk rentang pendek
         $hariMap = ['7d' => 7, '1m' => 30, '3m' => 90];
         if (isset($hariMap[$range])) {
             $jumlahHari = $hariMap[$range];
@@ -129,10 +129,10 @@ class DashboardController extends Controller
             return [$labels, $alat, $ruangan];
         }
 
-        // Bucket bulanan: 1 semester (6 bulan) atau all time
+        // Kelompokkan per bulan: 1 semester (6 bulan) atau sepanjang waktu
         if ($range === '1sem') {
             $jumlahBulan = 6;
-        } else { // all time
+        } else { // sepanjang waktu
             $awal = Peminjaman::min('created_at');
             $awalBk = BookingRuangan::min('created_at');
             $paling = collect([$awal, $awalBk])->filter()->min();

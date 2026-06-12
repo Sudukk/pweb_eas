@@ -24,7 +24,7 @@ $statusIcon = match($b->status) {
     <i class="bi bi-arrow-left me-1"></i>Kembali
 </a>
 
-{{-- Hero banner --}}
+{{-- Banner atas --}}
 <div class="rounded-3 overflow-hidden mb-4 shadow-sm position-relative"
      style="height:200px;background:#1e3a5f">
     @if($b->ruangan->foto_url)
@@ -50,7 +50,7 @@ $statusIcon = match($b->status) {
 
 <div class="row g-3">
 
-    {{-- ── Denah kursi (full width on mobile, right col on desktop) ─────── --}}
+    {{-- ── Denah kursi (lebar penuh di HP, kolom kanan di desktop) ──────── --}}
     <div class="col-12 col-lg-7 order-lg-2">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between">
@@ -73,7 +73,7 @@ $statusIcon = match($b->status) {
         </div>
     </div>
 
-    {{-- ── Info booking (left col on desktop) ──────────────────────────── --}}
+    {{-- ── Info booking (kolom kiri di desktop) ─────────────────────────── --}}
     <div class="col-12 col-lg-5 order-lg-1">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white border-bottom d-flex align-items-center gap-2">

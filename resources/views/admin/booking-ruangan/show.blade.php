@@ -17,7 +17,7 @@ $statusCls = match($b->status) {
     <i class="bi bi-arrow-left me-1"></i>Kembali
 </a>
 
-{{-- Hero --}}
+{{-- Banner atas --}}
 <div class="rounded-3 overflow-hidden mb-4 shadow-sm position-relative"
      style="height:190px;background:#1e3a5f">
     @if($b->ruangan->foto_url)
@@ -43,7 +43,7 @@ $statusCls = match($b->status) {
     {{-- ── Kolom kiri: detail ─────────────────────────────────────────────── --}}
     <div class="col-lg-5">
 
-        {{-- Pemohon card --}}
+        {{-- Kartu pemohon --}}
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
@@ -61,7 +61,7 @@ $statusCls = match($b->status) {
             </div>
         </div>
 
-        {{-- Info card --}}
+        {{-- Kartu info booking --}}
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white border-bottom d-flex align-items-center gap-2">
                 <i class="bi bi-info-circle text-primary"></i>
@@ -126,7 +126,7 @@ $statusCls = match($b->status) {
                 @endif
             </ul>
 
-            {{-- Actions --}}
+            {{-- Tombol aksi --}}
             @if(in_array($b->status, ['pending', 'disetujui']))
             <div class="card-footer bg-white d-flex justify-content-end align-items-center gap-2 flex-wrap">
                 <div class="d-flex gap-2">

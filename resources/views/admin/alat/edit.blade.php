@@ -11,7 +11,7 @@
                     @csrf @method('PUT')
                     <div class="row g-3">
 
-                        {{-- Foto upload area --}}
+                        {{-- Area unggah foto --}}
                         <div class="col-12">
                             <label class="form-label">Foto Alat <small class="text-muted">(biarkan kosong jika tidak ingin mengubah)</small></label>
                             <div class="d-flex gap-3 align-items-start">

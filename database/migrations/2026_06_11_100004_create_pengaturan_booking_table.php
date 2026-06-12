@@ -17,7 +17,7 @@ return new class extends Migration
             $table->timestamp('updated_at')->nullable();
         });
 
-        // Seed one row - always exactly one row in this table.
+        // Isi satu baris awal - tabel ini memang selalu cuma berisi satu baris.
         DB::table('pengaturan_booking')->insert(['jam_alokasi' => '22:00:00']);
     }
 

@@ -210,7 +210,7 @@ class DatabaseSeeder extends Seeder
             $ruangan[] = Ruangan::create($data + ['aktif' => true]);
         }
 
-        // ── Sample booking ruangan (untuk besok, status pending) ──────────────
+        // ── Contoh booking ruangan (untuk besok, status pending) ──────────────
         $besok  = now()->addDay()->toDateString();
         $kodeBk = fn ($i) => 'BKR-' . now()->format('Ymd') . '-' . str_pad($i, 3, '0', STR_PAD_LEFT);
 

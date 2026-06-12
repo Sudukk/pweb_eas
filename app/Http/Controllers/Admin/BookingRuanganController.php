@@ -144,7 +144,7 @@ class BookingRuanganController extends Controller
 
         $p = PengaturanBooking::firstOrNew([]);
         $p->jam_alokasi   = $request->jam_alokasi . ':00';
-        $p->last_ran_date = null; // reset so it can run again today at the new time
+        $p->last_ran_date = null; // direset biar alokasi bisa jalan lagi hari ini di jam yang baru
         $p->updated_by    = auth()->id();
         $p->updated_at    = now();
         $p->save();

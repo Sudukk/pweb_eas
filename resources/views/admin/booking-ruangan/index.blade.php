@@ -9,7 +9,7 @@
     </div>
 </div>
 
-{{-- Alokasi otomatis card --}}
+{{-- Kartu alokasi otomatis --}}
 <div class="card border-0 shadow-sm mb-4" style="border-left:4px solid #1e3a5f !important">
     <div class="card-body py-3">
         <div class="d-flex align-items-center gap-2 mb-2">
@@ -40,7 +40,7 @@
     </div>
 </div>
 
-{{-- Status quick-filter tabs --}}
+{{-- Tab filter cepat berdasarkan status --}}
 @php
 $statusTabs = [
     ''           => 'Semua',
@@ -60,7 +60,7 @@ $activeStatus = request('status', '');
     @endforeach
 </div>
 
-{{-- Search + date filter --}}
+{{-- Pencarian + filter tanggal --}}
 <form method="GET" class="row g-2 mb-3">
     @if($activeStatus)
     <input type="hidden" name="status" value="{{ $activeStatus }}">
@@ -82,7 +82,7 @@ $activeStatus = request('status', '');
     </div>
 </form>
 
-{{-- Table (desktop) --}}
+{{-- Tabel (tampilan desktop) --}}
 <div class="card border-0 shadow-sm d-none d-md-block">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" style="font-size:.875rem">
@@ -145,7 +145,7 @@ $activeStatus = request('status', '');
     @endif
 </div>
 
-{{-- Card list (mobile) --}}
+{{-- Daftar kartu (tampilan HP) --}}
 <div class="d-md-none">
     @forelse($booking as $b)
     <div class="card border-0 shadow-sm mb-2">

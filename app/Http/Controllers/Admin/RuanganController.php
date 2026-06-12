@@ -42,7 +42,7 @@ class RuanganController extends Controller
 
         $newFoto = $this->saveFoto($request);
         if ($newFoto) {
-            // Delete old file if it was an uploaded one (not a seeded path)
+            // Hapus foto lama kalau memang hasil unggahan (bukan path bawaan seeder)
             if ($ruangan->foto_url && str_starts_with($ruangan->foto_url, '/images/ruangan/uploads/')) {
                 $old = public_path($ruangan->foto_url);
                 if (file_exists($old)) unlink($old);

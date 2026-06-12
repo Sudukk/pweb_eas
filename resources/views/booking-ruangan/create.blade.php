@@ -5,7 +5,7 @@
 @php $role = auth()->user()->role; @endphp
 
 <style>
-/* ── Step nav ───────────────────────────────────────────── */
+/* ── Indikator langkah ──────────────────────────────────── */
 .step-nav { display:flex; align-items:center; }
 .step-node { display:flex; flex-direction:column; align-items:center; gap:4px; }
 .step-circle {
@@ -22,7 +22,7 @@
 .step-line { flex:1; height:2px; background:#dee2e6; margin:0 10px 18px; }
 .step-line.done { background:#198754; }
 
-/* ── Room card preview ──────────────────────────────────── */
+/* ── Kartu pratinjau ruangan ────────────────────────────── */
 .room-preview {
     border-radius:8px;
     overflow:hidden;
@@ -48,7 +48,7 @@
     flex-shrink:0;
 }
 
-/* ── Seat picker ────────────────────────────────────────── */
+/* ── Pemilih kursi ──────────────────────────────────────── */
 .seat-picker {
     background:#fff;
     padding:24px 16px 20px;
@@ -67,7 +67,7 @@
     display:flex; flex-direction:column;
     gap:8px;
     width:fit-content;
-    margin:0 auto;   /* centers the whole grid */
+    margin:0 auto;   /* biar grid-nya ke tengah */
 }
 .sp-row { display:flex; align-items:center; gap:5px; }
 .sp-row-lbl {
@@ -76,7 +76,7 @@
 }
 .sp-aisle { width:18px; flex-shrink:0; }
 
-/* Seat buttons */
+/* Tombol kursi */
 .sp-seat {
     width:38px; height:34px;
     border-radius:6px 6px 3px 3px;
@@ -110,7 +110,7 @@
     cursor:not-allowed; opacity:.75;
 }
 
-/* Legend */
+/* Keterangan warna */
 .sp-legend {
     display:flex; gap:20px; flex-wrap:wrap;
     justify-content:center;
@@ -124,7 +124,7 @@
     border:2px solid transparent;
 }
 
-/* Summary bar */
+/* Bar ringkasan */
 .sp-summary {
     margin-top:16px; padding:10px 16px;
     border-radius:8px; font-size:.84rem;
@@ -132,7 +132,7 @@
     border:1px solid #d0dcf0; min-height:42px;
 }
 
-/* Slot info chips */
+/* Chip info slot */
 .slot-chips {
     display:flex; flex-wrap:wrap; gap:8px;
     padding:12px 20px;
@@ -145,7 +145,7 @@
     font-size:.8rem; color:#1e3a5f; font-weight:500;
 }
 
-/* Spinner */
+/* Animasi loading */
 .sp-spinner { text-align:center; padding:48px; color:#adb5bd; display:none; }
 
 /* Toolbar pilih semua */
@@ -155,7 +155,7 @@
 <div class="row justify-content-center">
 <div class="col-lg-9 col-xl-8">
 
-{{-- Step indicator --}}
+{{-- Indikator langkah --}}
 <div class="step-nav mb-4 px-1">
     <div class="step-node">
         <div class="step-circle active" id="dot1">1</div>
@@ -171,7 +171,7 @@
 <form action="{{ route('booking-ruangan.store') }}" method="POST" id="formBooking">
 @csrf
 
-{{-- ══ STEP 1 ═══════════════════════════════════════════════════ --}}
+{{-- ══ LANGKAH 1 ═══════════════════════════════════════════════ --}}
 <div id="step1">
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-white border-bottom">
@@ -198,7 +198,7 @@
             </select>
             @error('ruangan_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
 
-            {{-- Room preview card --}}
+            {{-- Kartu pratinjau ruangan --}}
             <div id="ruanganPreview" class="room-preview mt-2" style="display:none">
                 <div id="ruanganPreviewImgWrap" class="room-preview-placeholder">
                     <i class="bi bi-building text-secondary"></i>
@@ -226,7 +226,7 @@
             @error('tipe')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
 
-        {{-- Mata kuliah (kelas only) --}}
+        {{-- Mata kuliah (khusus tipe kelas) --}}
         <div class="mb-3" id="mkWrap" style="display:none">
             <label class="form-label fw-semibold small text-uppercase text-muted">Mata Kuliah / Nama Kelas</label>
             <input type="text" name="mata_kuliah"
@@ -305,11 +305,11 @@
 </div>
 </div>
 
-{{-- ══ STEP 2: Seat Picker ════════════════════════════════════════ --}}
+{{-- ══ LANGKAH 2: Pilih Kursi ═════════════════════════════════════ --}}
 <div id="step2" style="display:none">
 <div class="card border-0 shadow-sm overflow-hidden">
 
-    {{-- Header --}}
+    {{-- Bagian atas --}}
     <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
         <h6 class="fw-bold mb-0">Pilih Kursi</h6>
         <button type="button" class="btn btn-sm btn-outline-secondary" id="btnBack">
@@ -317,14 +317,14 @@
         </button>
     </div>
 
-    {{-- Slot chips --}}
+    {{-- Chip info slot --}}
     <div class="slot-chips" id="slotBar">
         <div class="slot-chip"><i class="bi bi-building" style="color:#1e3a5f"></i><span id="infoRuangan">...</span></div>
         <div class="slot-chip"><i class="bi bi-calendar3" style="color:#1e3a5f"></i><span id="infoTanggal">...</span></div>
         <div class="slot-chip"><i class="bi bi-clock" style="color:#1e3a5f"></i><span id="infoSlot">...</span></div>
     </div>
 
-    {{-- Seat picker body --}}
+    {{-- Isi pemilih kursi --}}
     <div class="seat-picker">
         {{-- Papan tulis --}}
         <div class="sp-board"><i class="bi bi-easel2 me-1"></i>PAPAN TULIS / DEPAN KELAS</div>
@@ -336,16 +336,16 @@
             </button>
         </div>
 
-        {{-- Spinner --}}
+        {{-- Animasi loading --}}
         <div class="sp-spinner" id="spSpinner">
             <div class="spinner-border text-secondary mb-2" style="width:1.8rem;height:1.8rem"></div>
             <div class="small">Memuat denah kursi...</div>
         </div>
 
-        {{-- Grid (centered via margin:0 auto on .sp-grid) --}}
+        {{-- Denah kursi (ditengahkan lewat margin:0 auto di .sp-grid) --}}
         <div class="sp-grid" id="spGrid"></div>
 
-        {{-- Legend --}}
+        {{-- Keterangan warna --}}
         <div class="sp-legend">
             <div class="sp-legend-item">
                 <div class="sp-legend-dot" style="background:#e9ecef;border-color:#ced4da"></div>Tersedia
@@ -358,13 +358,13 @@
             </div>
         </div>
 
-        {{-- Summary --}}
+        {{-- Ringkasan --}}
         <div class="sp-summary" id="spSummary">
             <i class="bi bi-hand-index me-1 text-secondary"></i>Klik kursi untuk memilih.
         </div>
     </div>
 
-    {{-- Footer --}}
+    {{-- Bagian bawah --}}
     <div class="card-footer bg-white d-flex justify-content-end">
         <button type="submit" class="btn btn-primary px-4" id="btnSubmit" disabled>
             <i class="bi bi-send me-1"></i>Ajukan Booking
@@ -373,7 +373,7 @@
 </div>
 </div>
 
-{{-- Hidden inputs --}}
+{{-- Input tersembunyi --}}
 <div id="kursiInputs"></div>
 </form>
 
@@ -418,7 +418,7 @@
     let seatInterval     = null;
     let refreshCountdown = REFRESH_EVERY;
 
-    /* ── Room preview ───────────────────────────────────── */
+    /* ── Pratinjau ruangan ──────────────────────────────── */
     const ruanganSel = document.getElementById('ruangan_id');
     const preview    = document.getElementById('ruanganPreview');
     const previewImg = document.getElementById('ruanganPreviewImgWrap');
@@ -442,13 +442,13 @@
     ruanganSel.addEventListener('change', updateRuanganPreview);
     updateRuanganPreview();
 
-    /* ── Tipe toggle ────────────────────────────────────── */
+    /* ── Tampilkan/sembunyikan field mata kuliah ────────── */
     function toggleMk() {
         mkWrap.style.display = tipe && tipe.value === 'kelas' ? 'block' : 'none';
     }
     if (tipe) { tipe.addEventListener('change', toggleMk); toggleMk(); }
 
-    /* ── Validate step 1 ───────────────────────────────── */
+    /* ── Validasi langkah 1 ────────────────────────────── */
     function validateStep1() {
         const checks = [
             [document.getElementById('ruangan_id'),       'Pilih ruangan terlebih dahulu.'],
@@ -466,7 +466,7 @@
         return true;
     }
 
-    /* ── Next: go to step 2 ────────────────────────────── */
+    /* ── Lanjut ke langkah 2 ───────────────────────────── */
     btnNext.addEventListener('click', function () {
         if (!validateStep1()) return;
 
@@ -511,7 +511,7 @@
         startLiveBars(tanggal);
     });
 
-    /* ── Back: go to step 1 ────────────────────────────── */
+    /* ── Kembali ke langkah 1 ──────────────────────────── */
     btnBack.addEventListener('click', function () {
         stopLiveBars();
         step2.style.display = 'none';
@@ -529,7 +529,7 @@
             : 'Lanjut Pilih Kursi <i class="bi bi-arrow-right ms-1"></i>';
     });
 
-    /* ── Fetch taken seats ─────────────────────────────── */
+    /* ── Ambil daftar kursi yang sudah terisi ──────────── */
     function fetchTaken(ruanganId, tanggal, mulai, selesai, silent = false) {
         if (!silent) { spSpinner.style.display = ''; spGrid.innerHTML = ''; }
 
@@ -558,7 +558,7 @@
         });
     }
 
-    /* ── Auto-refresh kursi terpakai (silent) ──────────── */
+    /* ── Refresh kursi terpakai otomatis (tanpa loading) ─ */
     function startLiveBars(tanggal) {
         stopLiveBars();
         refreshCountdown = REFRESH_EVERY;
@@ -580,7 +580,7 @@
         refreshCountdown = REFRESH_EVERY;
     }
 
-    /* ── Render seat grid ──────────────────────────────── */
+    /* ── Gambar denah kursi ────────────────────────────── */
     function renderGrid(n) {
         const rows = Math.ceil(n / SEATS_PER_ROW);
         spGrid.innerHTML = '';
@@ -684,7 +684,7 @@
             labels.map(l => '<span class="badge" style="background:#1e3a5f">' + l + '</span>').join(' ');
     }
 
-    /* ── Restore on server validation failure ─────────── */
+    /* ── Pulihkan pilihan kalau validasi server gagal ──── */
     @if(old('kursi_dipilih'))
     (function () {
         @json(old('kursi_dipilih', [])).forEach(no => {

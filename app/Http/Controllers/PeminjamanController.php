@@ -53,7 +53,7 @@ class PeminjamanController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
-            // Generate kode pinjam
+            // Buat kode pinjam
             $urutan    = Peminjaman::whereDate('created_at', today())->count() + 1;
             $kodePinjam = 'PJM-' . now()->format('Ymd') . '-' . str_pad($urutan, 3, '0', STR_PAD_LEFT);
 

@@ -47,7 +47,7 @@
             z-index: 1030;
         }
 
-        /* ── Overlay (mobile) ────────────────────────── */
+        /* ── Overlay (tampilan HP) ───────────────────── */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -57,7 +57,7 @@
         }
         .sidebar-overlay.show { display: block; }
 
-        /* ── Mobile breakpoint ───────────────────────── */
+        /* ── Breakpoint layar kecil ──────────────────── */
         @media (max-width: 767.98px) {
             .sidebar { transform: translateX(-220px); }
             .sidebar.show { transform: translateX(0); }
@@ -69,7 +69,7 @@
 </head>
 <body>
 
-{{-- Overlay (tap to close sidebar on mobile) --}}
+{{-- Overlay (ketuk untuk menutup sidebar di HP) --}}
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 {{-- SIDEBAR --}}
@@ -146,7 +146,7 @@
 <div class="main">
     <div class="topbar d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
-            {{-- Hamburger (mobile only) --}}
+            {{-- Tombol menu (hanya di HP) --}}
             <button class="btn btn-link p-0 d-md-none me-1 text-dark" id="sidebarToggle">
                 <i class="bi bi-list fs-4"></i>
             </button>
@@ -228,13 +228,13 @@
     if (close)   close.addEventListener('click', closeSidebar);
     if (overlay) overlay.addEventListener('click', closeSidebar);
 
-    // Close sidebar on nav-link click (mobile)
+    // Tutup sidebar saat menu diklik (di HP)
     sidebar.querySelectorAll('a').forEach(a => {
         a.addEventListener('click', () => { if (window.innerWidth < 768) closeSidebar(); });
     });
 })();
 
-// Bootstrap tooltips
+// Aktifkan tooltip Bootstrap
 document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
     new bootstrap.Tooltip(el, { trigger: 'hover focus' });
 });
@@ -263,7 +263,7 @@ document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
     }
 
     function render(data) {
-        // Badge
+        // Angka notifikasi belum dibaca
         if (data.unread > 0) {
             badge.textContent = data.unread > 99 ? '99+' : data.unread;
             badge.style.display = '';
@@ -271,7 +271,7 @@ document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
             badge.style.display = 'none';
         }
 
-        // List
+        // Daftar notifikasi
         if (!data.items.length) {
             list.innerHTML = '<div class="text-center text-muted small py-4">'
                 + '<i class="bi bi-bell-slash d-block mb-1 fs-5"></i>Belum ada notifikasi</div>';

@@ -151,7 +151,7 @@
 
         roleSelect.addEventListener('change', toggleIdentifier);
 
-        // Restore state on validation error (old value)
+        // Tampilkan field sesuai role saat halaman dibuka (mis. setelah validasi gagal)
         toggleIdentifier();
     </script>
 </body>

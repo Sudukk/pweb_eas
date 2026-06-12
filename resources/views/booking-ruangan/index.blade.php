@@ -41,7 +41,7 @@
     <div class="col-sm-6 col-xl-4">
         <div class="card border-0 shadow-sm h-100 overflow-hidden">
 
-            {{-- Room photo --}}
+            {{-- Foto ruangan --}}
             <div style="position:relative;height:130px;overflow:hidden;background:#e8edf5;flex-shrink:0">
                 @if($b->ruangan->foto_url)
                 <img src="{{ $b->ruangan->foto_url }}" alt="{{ $b->ruangan->nama }}"
@@ -53,12 +53,12 @@
                 </div>
                 @endif
 
-                {{-- Status badge --}}
+                {{-- Badge status --}}
                 <div style="position:absolute;top:8px;right:10px">
                     @include('components.status-badge', ['status' => $b->status])
                 </div>
 
-                {{-- Date chip --}}
+                {{-- Chip tanggal --}}
                 <div style="position:absolute;bottom:8px;left:10px;
                             background:rgba(0,0,0,.52);border-radius:6px;
                             padding:2px 8px;color:#fff;font-size:.73rem;backdrop-filter:blur(4px)">
